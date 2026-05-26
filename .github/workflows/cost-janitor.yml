@@ -1,0 +1,89 @@
+name: Cost Janitor
+
+on:
+  pull_request:
+
+jobs:
+  cost-janitor:
+    runs-on: ubuntu-latest
+
+    services:
+      localstack:
+        image: localstack/localstack:4.14.0
+        ports:
+          - 4566:4566
+        options: >-
+          --health-cmd "curl -f http://localhost:4566/_localstack/health"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Apply Terraform
+        working-directory: terraform
+        run: |
+          terraform init
+          terraform apply -auto-approve
+
+      - name: Install janitor dependencies
+        working-directory: janitor
+        run: pip install -r requirements.txt
+
+      - name: Run Cost Janitor (dry-run)
+        id: janitor
+        working-directory: janitor
+        run: python janitor.py --dry-run
+        continue-on-error: true
+
+      - name: Upload report artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cost-janitor-report
+          path: |
+            janitor/report.json
+            janitor/report.md
+
+      - name: Post PR comment if orphans found
+        if: always() && github.event_name == 'pull_request' && steps.janitor.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('janitor/report.md', 'utf8');
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.startsWith('# Cost Janitor Report'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Fail job if orphans were found
+        if: steps.janitor.outcome == 'failure'
+        run: exit 1

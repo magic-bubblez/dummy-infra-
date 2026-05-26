@@ -1,0 +1,39 @@
+{
+  "scan_timestamp": "2026-05-26T12:00:00Z",
+  "account_id": "000000000000",
+  "region": "us-east-1",
+  "summary": {
+    "total_orphans": 2,
+    "estimated_monthly_waste_usd": 4.25
+  },
+  "findings": [
+    {
+      "resource_id": "vol-0abc123def456789",
+      "resource_type": "ebs_volume",
+      "reason": "unattached",
+      "age_days": 3,
+      "estimated_monthly_cost_usd": 0.64,
+      "tags": {
+        "Project": "nimbuskart",
+        "Environment": "staging",
+        "Owner": "devops-team"
+      },
+      "suggested_action": "delete",
+      "safe_to_auto_delete": false
+    },
+    {
+      "resource_id": "eipalloc-0abc123def456789",
+      "resource_type": "elastic_ip",
+      "reason": "unassociated",
+      "age_days": 0,
+      "estimated_monthly_cost_usd": 3.65,
+      "tags": {
+        "Project": null,
+        "Environment": null,
+        "Owner": null
+      },
+      "suggested_action": "release",
+      "safe_to_auto_delete": false
+    }
+  ]
+}

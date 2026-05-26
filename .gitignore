@@ -1,0 +1,14 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Python
+janitor/.venv/
+__pycache__/
+*.pyc
+
+# Generated janitor output (samples/ has the committed examples)
+janitor/report.json
+janitor/report.md
+
