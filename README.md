@@ -1,7 +1,7 @@
 
 ## Overview
 
-orphaned resources are the biggest cause of wastage of financial resources of the company. this repo contains a small slice of the fix - infrastructure as code that applies cleanly on LocalStack, a cost janitor that finds orphaned resources and estimates what they're costing, and a CI/CD workflow that enforces it on every PR so the waste can't silently creep back.
+orphaned resources are the biggest cause of wastage of financial resources for any company. this repo contains a small slice of the fix - infrastructure as code that applies cleanly on LocalStack, a cost janitor that finds orphaned resources and estimates what they're costing, and a CI/CD workflow that enforces it on every PR so the waste can't silently creep back.
 
 
 ## How to run locally
@@ -57,10 +57,7 @@ python janitor.py --dry-run
           │  22 from configurable CIDR           │
           └──────────────────────────────────────┘
 
-  S3:  nimbuskart-staging-app-logs
-       versioning enabled, non-current versions expire after 30 days
-
-  EBS: 8 GB volume in us-east-1a — unattached (intentional orphan for Part B)
+ 
 ```
 
 
