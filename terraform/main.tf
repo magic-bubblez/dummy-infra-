@@ -30,19 +30,19 @@ provider "aws" {
 }
 
 module "network" {
-  source              = "./modules/network"
-  vpc_cidr            = var.vpc_cidr
-  availability_zones  = var.availability_zones
-  public_subnet_cidrs = var.public_subnet_cidrs
-  common_tags         = local.common_tags
-  ssh_cidr            = var.ssh_cidr
+  source               = "./modules/network"
+  vpc_cidr             = var.vpc_cidr
+  availability_zones   = var.availability_zones
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
+  common_tags          = local.common_tags
 }
 
 resource "aws_instance" "web" {
   count                  = 2
   ami                    = "ami-00000000"
   instance_type          = "t3.micro"
-  subnet_id              = module.network.subnet_ids[count.index]
+  subnet_id              = module.network.private_subnet_ids[count.index]
   vpc_security_group_ids = [module.network.security_group_id]
 
   tags = merge(local.common_tags, {

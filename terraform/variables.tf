@@ -33,9 +33,7 @@ variable "public_subnet_cidrs" {
   default = ["10.20.1.0/24", "10.20.2.0/24"]
 }
 
-# WARNING: default 0.0.0.0/0 exposes SSH to the entire internet.
-# In production, restrict this to a known corporate or VPN CIDR.
-variable "ssh_cidr" {
-  type    = string
-  default = "0.0.0.0/0"
+variable "private_subnet_cidrs" {
+  type    = list(string)
+  default = ["10.20.3.0/24", "10.20.4.0/24"]
 }
